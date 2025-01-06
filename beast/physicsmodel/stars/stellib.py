@@ -34,6 +34,7 @@ config = {
     "btsettl_medres": __ROOT__ + "bt-settl.medres.grid.fits",
     "munari": __ROOT__ + "atlas9-munari.hires.grid.fits",
     "aringer": __ROOT__ + "Aringer.AGB.grid.fits",
+    "powr_lmcwne": __ROOT__ + "PoWR_LMC_WNE.grid.fits",
 }
 
 __all__ = [
@@ -46,6 +47,7 @@ __all__ = [
     "Elodie",
     "BaSeL",
     "Aringer",
+    "PoWRlmcwne",
 ]
 
 
@@ -1920,6 +1922,87 @@ class Aringer(Stellib):
             (3.39794 - dlogT, 2.00 + dlogg),
             (3.41497 - dlogT, 2.00 + dlogg),
             (3.41497 - dlogT, 5.00 + dlogg),
+        ]
+
+        return np.array(bbox)
+
+    @property
+    def logT(self):
+        return self.grid["logT"]
+
+    @property
+    def logg(self):
+        return self.grid["logg"]
+
+    @property
+    def Teff(self):
+        return self.grid["Teff"]
+
+    @property
+    def Z(self):
+        return self.grid["Z"]
+
+    @property
+    def logZ(self):
+        return self.grid["logz"]
+
+
+class PoWRlmcwne(Stellib):
+    """Potsdam Wolf-Rayet star Library
+
+    References
+    ----------
+
+    https://www.astro.physik.uni-potsdam.de/~wrh/PoWR/powrgrid1.php
+
+    The models are arranged in different Model Grids.
+    Each model grid is characterized by a set of common parameters,
+    such as stellar luminosity, terminal wind velocity, clumping contrast,
+    and chemical composition. This grid is for Wolf-Rayet stars of hydrogen-free models (WNE)
+    with the metallicity of the Large Magellanic Cloud (LMC).
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = "PoWRlmcwne"
+        self.source = config["powr_lmcwne"]
+        self._load_()
+
+    def _load_(self):
+        g = SpectralGrid(self.source, backend="memory")
+        self.wavelength = g.lamb
+        self.grid = g.grid
+        self.header["NAME"] = self.name
+        self.spectra = g.seds
+
+    def bbox(self, dlogT=0.05, dlogg=0.25):
+        """ Boundary of Aringer library for C+M+K giants
+
+        Parameters
+        ----------
+        dlogT: float
+            log-temperature tolerance before extrapolation limit
+
+        dlogg: float
+            log-g tolerance before extrapolation limit
+
+        Returns
+        -------
+        bbox: ndarray
+            (logT, logg) edges of the bounding polygon
+            Excludes excess isochrone models (red/green lines in Fig. 4 of Aringer+2016)
+        """
+        bbox = [
+        (4.3500309, 2.97),
+        (4.478 + dlogT, 3.000 - dlogg),
+        (4.8000024 + dlogT, 3.97),
+        (5.35, 6.2),
+        (5.25, 6.2 + dlogg),
+        (5.09999913, 5.97),
+        (4.75000259, 4.57),
+        (4.45000309, 3.37),
+        (4.4000309 , 3.17),
+        (4.3500309 , 2.97),
         ]
 
         return np.array(bbox)
