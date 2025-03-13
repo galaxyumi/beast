@@ -35,6 +35,23 @@ config = {
     "munari": __ROOT__ + "atlas9-munari.hires.grid.fits",
     "aringer": __ROOT__ + "Aringer.AGB.grid.fits",
     "powr_lmcwne": __ROOT__ + "PoWR_LMC_WNE.grid.fits",
+    "powr_lmcwnlh20": __ROOT__ + "PoWR_LMC_WNLh20.grid.fits",
+    "powr_lmcwnlh40": __ROOT__ + "PoWR_LMC_WNLh40.grid.fits",
+    "powr_lmcwnc": __ROOT__ + "PoWR_LMC_WC.grid.fits",
+    "powr_smcwne": __ROOT__ + "PoWR_SMC_WNE.grid.fits",
+    "powr_smcwnlh20": __ROOT__ + "PoWR_SMC_WNLh20.grid.fits",
+    "powr_smcwnlh40": __ROOT__ + "PoWR_SMC_WNLh40.grid.fits",
+    "powr_smcwnlh60": __ROOT__ + "PoWR_SMC_WNLh60.grid.fits",
+    "powr_smcwnc": __ROOT__ + "PoWR_SMC_WC.grid.fits",
+    "powr_007wne": __ROOT__ + "PoWR_007_WNE.grid.fits",
+    "powr_007wnlh20": __ROOT__ + "PoWR_007_WNLh20.grid.fits",
+    "powr_007wnlh40": __ROOT__ + "PoWR_007_WNLh40.grid.fits",
+    "powr_007wnlh60": __ROOT__ + "PoWR_007_WNLh60.grid.fits",
+    "powr_007wnc": __ROOT__ + "PoWR_007_WC.grid.fits",
+    "powr_mwwne": __ROOT__ + "PoWR_MW_WNE.grid.fits",
+    "powr_mwwnlh20": __ROOT__ + "PoWR_MW_WNLh20.grid.fits",
+    "powr_mwwnlh50": __ROOT__ + "PoWR_MW_WNLh50.grid.fits",
+    "powr_mwwnc": __ROOT__ + "PoWR_MW_WC.grid.fits",
 }
 
 __all__ = [
@@ -1948,18 +1965,14 @@ class Aringer(Stellib):
 
 
 class PoWRlmcwne(Stellib):
-    """Potsdam Wolf-Rayet star Library
+    """This Potsdam Wolf-Rayet star Library is for Wolf-Rayet stars
+    of hydrogen-free models (WNE) with the metallicity of the Large Magellanic Cloud (LMC).
 
     References
     ----------
 
-    https://www.astro.physik.uni-potsdam.de/~wrh/PoWR/powrgrid1.php
-
-    The models are arranged in different Model Grids.
-    Each model grid is characterized by a set of common parameters,
-    such as stellar luminosity, terminal wind velocity, clumping contrast,
-    and chemical composition. This grid is for Wolf-Rayet stars of hydrogen-free models (WNE)
-    with the metallicity of the Large Magellanic Cloud (LMC).
+    PoWR official site: https://www.astro.physik.uni-potsdam.de/~wrh/PoWR/powrgrid1.php
+    
     """
 
     def __init__(self, *args, **kwargs):
@@ -1976,7 +1989,7 @@ class PoWRlmcwne(Stellib):
         self.spectra = g.seds
 
     def bbox(self, dlogT=0.05, dlogg=0.25):
-        """ Boundary of Aringer library for C+M+K giants
+        """ Boundary of PoWR LMC_WNE library for Wolf-Rayet stars
 
         Parameters
         ----------
@@ -1990,19 +2003,250 @@ class PoWRlmcwne(Stellib):
         -------
         bbox: ndarray
             (logT, logg) edges of the bounding polygon
-            Excludes excess isochrone models (red/green lines in Fig. 4 of Aringer+2016)
         """
         bbox = [
-        (4.3500309, 2.97),
-        (4.478 + dlogT, 3.000 - dlogg),
-        (4.8000024 + dlogT, 3.97),
-        (5.35, 6.2),
-        (5.25, 6.2 + dlogg),
-        (5.09999913, 5.97),
-        (4.75000259, 4.57),
-        (4.45000309, 3.37),
-        (4.4000309 , 3.17),
-        (4.3500309 , 2.97),
+            (4.631237877137434, 3.374782950167283),
+            (4.599379720491766, 3.3200194300220254),
+            (4.5642102607123, 3.395438147567475),
+            (4.550006952953939, 3.5731089293626734),
+            (4.565089584829087, 3.7489586119858007),
+            (5.222743121698328, 6.379586183395668),
+            (5.255522053844292, 6.418470748407599),
+            (5.285794174203833, 6.344555679339481),
+            (5.299996248434271, 6.166879304860396),
+            (5.284911511176742, 5.991030977015099),
+            (4.631237877137434, 3.374782950167283),
+        ]
+
+        return np.array(bbox)
+
+    @property
+    def logT(self):
+        return self.grid["logT"]
+
+    @property
+    def logg(self):
+        return self.grid["logg"]
+
+    @property
+    def Teff(self):
+        return self.grid["Teff"]
+
+    @property
+    def Z(self):
+        return self.grid["Z"]
+
+    @property
+    def logZ(self):
+        return self.grid["logz"]
+
+
+class PoWRsmcwne(Stellib):
+    """This Potsdam Wolf-Rayet star Library is for Wolf-Rayet stars
+    of hydrogen-free models (WNE) with the metallicity of the Small Magellanic Cloud (SMC).
+
+    References
+    ----------
+
+    PoWR official site: https://www.astro.physik.uni-potsdam.de/~wrh/PoWR/powrgrid1.php
+    
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = "PoWRsmcwne"
+        self.source = config["powr_smcwne"]
+        self._load_()
+
+    def _load_(self):
+        g = SpectralGrid(self.source, backend="memory")
+        self.wavelength = g.lamb
+        self.grid = g.grid
+        self.header["NAME"] = self.name
+        self.spectra = g.seds
+
+    def bbox(self, dlogT=0.05, dlogg=0.25):
+        """ Boundary of PoWR SMC_WNE library for Wolf-Rayet stars
+
+        Parameters
+        ----------
+        dlogT: float
+            log-temperature tolerance before extrapolation limit
+
+        dlogg: float
+            log-g tolerance before extrapolation limit
+
+        Returns
+        -------
+        bbox: ndarray
+            (logT, logg) edges of the bounding polygon
+        """
+        bbox = [
+            (4.631237877137434, 3.374782950167283),
+            (4.599379720491766, 3.3200194300220254),
+            (4.5642102607123, 3.395438147567475),
+            (4.550006952953939, 3.5731089293626734),
+            (4.565089584829087, 3.7489586119858007),
+            (5.122744367560492, 5.979588248000214),
+            (5.155523247548066, 6.01847042455776),
+            (5.185795075109314, 5.94455419232561),
+            (5.199996856528572, 5.766878205007638),
+            (5.184912104449411, 5.591030891339837),
+            (4.631237877137434, 3.374782950167283),
+        ]
+
+        return np.array(bbox)
+
+    @property
+    def logT(self):
+        return self.grid["logT"]
+
+    @property
+    def logg(self):
+        return self.grid["logg"]
+
+    @property
+    def Teff(self):
+        return self.grid["Teff"]
+
+    @property
+    def Z(self):
+        return self.grid["Z"]
+
+    @property
+    def logZ(self):
+        return self.grid["logz"]
+
+
+class PoWR007wne(Stellib):
+    """This Potsdam Wolf-Rayet star Library is for Wolf-Rayet stars
+    of hydrogen-free models (WNE) with the metallicity of 0.07Zsun.
+
+    References
+    ----------
+
+    PoWR official site: https://www.astro.physik.uni-potsdam.de/~wrh/PoWR/powrgrid1.php
+    
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = "PoWR007wne"
+        self.source = config["powr_007wne"]
+        self._load_()
+
+    def _load_(self):
+        g = SpectralGrid(self.source, backend="memory")
+        self.wavelength = g.lamb
+        self.grid = g.grid
+        self.header["NAME"] = self.name
+        self.spectra = g.seds
+
+    def bbox(self, dlogT=0.05, dlogg=0.25):
+        """ Boundary of PoWR 007_WNE library for Wolf-Rayet stars
+
+        Parameters
+        ----------
+        dlogT: float
+            log-temperature tolerance before extrapolation limit
+
+        dlogg: float
+            log-g tolerance before extrapolation limit
+
+        Returns
+        -------
+        bbox: ndarray
+            (logT, logg) edges of the bounding polygon
+        """
+        bbox = [
+            (4.531237816891499, 2.9747827834875804),
+            (4.494482363129349, 2.921528582269489),
+            (4.464210324119542, 2.99543772731433),
+            (4.45000693178556, 3.17310788697568),
+            (4.465089351808119, 3.348957566064079),
+            (5.218765779805231, 6.365218754751576),
+            (5.250624587500304, 6.419980502760538),
+            (5.285794146399241, 6.344555821878183),
+            (5.299996249196436, 6.166879610138119),
+            (5.284911570092344, 5.99103126433124),
+            (4.531237816891499, 2.9747827834875804),
+        ]
+
+        return np.array(bbox)
+
+    @property
+    def logT(self):
+        return self.grid["logT"]
+
+    @property
+    def logg(self):
+        return self.grid["logg"]
+
+    @property
+    def Teff(self):
+        return self.grid["Teff"]
+
+    @property
+    def Z(self):
+        return self.grid["Z"]
+
+    @property
+    def logZ(self):
+        return self.grid["logz"]
+
+
+class PoWRmwwne(Stellib):
+    """This Potsdam Wolf-Rayet star Library is for Wolf-Rayet stars
+    of hydrogen-free models (WNE) with the metallicity of the Milky Way.
+
+    References
+    ----------
+
+    PoWR official site: https://www.astro.physik.uni-potsdam.de/~wrh/PoWR/powrgrid1.php
+    
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = "PoWRmwwne"
+        self.source = config["powr_mwwne"]
+        self._load_()
+
+    def _load_(self):
+        g = SpectralGrid(self.source, backend="memory")
+        self.wavelength = g.lamb
+        self.grid = g.grid
+        self.header["NAME"] = self.name
+        self.spectra = g.seds
+
+    def bbox(self, dlogT=0.05, dlogg=0.25):
+        """ Boundary of PoWR MW_WNE library for Wolf-Rayet stars
+
+        Parameters
+        ----------
+        dlogT: float
+            log-temperature tolerance before extrapolation limit
+
+        dlogg: float
+            log-g tolerance before extrapolation limit
+
+        Returns
+        -------
+        bbox: ndarray
+            (logT, logg) edges of the bounding polygon
+        """
+        bbox = [
+            (4.531237816891499, 2.9747827834875804),
+            (4.494482363129349, 2.921528582269489),
+            (4.460960725827955, 3.013819374306184),
+            (4.450308589926389, 3.197594765741707),
+            (4.468765566652787, 3.3652062054823917),
+            (5.26876487353838, 6.56521772155546),
+            (5.305521117788687, 6.618470908463877),
+            (5.339042889781037, 6.526174054438773),
+            (5.349693704440316, 6.342393090032906),
+            (5.331234495313162, 6.1747837849194696),
+            (4.531237816891499, 2.9747827834875804),
         ]
 
         return np.array(bbox)
