@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+import astropy.units as u
 
 from dust_extinction.parameter_averages import F19
 from dust_extinction.averages import G03_SMCBar
@@ -61,7 +62,7 @@ class F19_D03_extension(F19):
 
     # update the wavelength range (in micron^-1)
     x_range = [0.3, 1.0 / 0.01]
-
+    
     def evaluate(self, x, Rv):
         """
         F19_D03_extension function
@@ -72,7 +73,7 @@ class F19_D03_extension(F19):
            expects either x in units of wavelengths or frequency
            or assumes wavelengths in wavenumbers [1/micron]
 
-           internally wavenumbers are used
+           internally wavelengths in angstrom are used
 
         Returns
         -------
@@ -84,6 +85,9 @@ class F19_D03_extension(F19):
         ValueError
            Input x values outside of defined range
         """
+        # convert wavelength to wavenumber
+        x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
+
         # just in case someone calls evaluate explicitly
         Rv = np.atleast_1d(Rv)
 
@@ -103,11 +107,11 @@ class F19_D03_extension(F19):
             d2mod = D03(modelname="MWRV55")
 
         # interpolate to get the model extinction for the input Rv value
-        dslope = (d2mod(x) - d1mod(x)) / (d2rv - d1rv)
-        dmod = d1mod(x) + dslope * (Rv - d1rv)
+        dslope = (d2mod(x_um_inv) - d1mod(x_um_inv)) / (d2rv - d1rv)
+        dmod = d1mod(x_um_inv) + dslope * (Rv - d1rv)
 
         # compute the F19 curve for the input Rv over the F19 defined wavelength range
-        gvals_f19 = (x > super().x_range[0]) & (x < super().x_range[1])
+        gvals_f19 = (x_um_inv.value > super().x_range[0]) & (x_um_inv.value < super().x_range[1])
         fmod = super().evaluate(x[gvals_f19], Rv)
 
         # now merge the two smoothly
@@ -115,9 +119,9 @@ class F19_D03_extension(F19):
         outmod[gvals_f19] = fmod
 
         merge_range = np.array([1.0 / 0.1675, super().x_range[1]])
-        gvals_merge = (x > merge_range[0]) & (x < merge_range[1])
+        gvals_merge = (x_um_inv.value > merge_range[0]) & (x_um_inv.value < merge_range[1])
         # have weights be zero at the min merge and 1 at the max merge
-        weights = (x[gvals_merge] - merge_range[0]) / (merge_range[1] - merge_range[0])
+        weights = (x_um_inv.value[gvals_merge] - merge_range[0]) / (merge_range[1] - merge_range[0])
         outmod[gvals_merge] = (1.0 - weights) * outmod[gvals_merge] + weights * dmod[
             gvals_merge
         ]
@@ -187,7 +191,7 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
            expects either x in units of wavelengths or frequency
            or assumes wavelengths in wavenumbers [1/micron]
 
-           internally wavenumbers are used
+           internally wavelengths in angstrom are used
 
         Returns
         -------
@@ -199,12 +203,15 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
         ValueError
            Input x values outside of defined range
         """
+        # convert wavelength to wavenumber
+        x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
+
         # compute the dust grain model
         dmodel = WD01(modelname="SMCBar")
-        dmod = dmodel(x)
+        dmod = dmodel(x_um_inv)
 
         # compute the F19 curve for the input Rv over the F19 defined wavelength range
-        gvals_g03 = (x > super().x_range[0]) & (x < super().x_range[1])
+        gvals_g03 = (x_um_inv.value > super().x_range[0]) & (x_um_inv.value < super().x_range[1])
         fmod = super().evaluate(x[gvals_g03])
 
         # now merge the two smoothly
@@ -212,9 +219,9 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
         outmod[gvals_g03] = fmod
 
         merge_range = np.array([1.0 / 0.1675, super().x_range[1]])
-        gvals_merge = (x > merge_range[0]) & (x < merge_range[1])
+        gvals_merge = (x_um_inv.value > merge_range[0]) & (x_um_inv.value < merge_range[1])
         # have weights be zero at the min merge and 1 at the max merge
-        weights = (x[gvals_merge] - merge_range[0]) / (merge_range[1] - merge_range[0])
+        weights = (x_um_inv.value[gvals_merge] - merge_range[0]) / (merge_range[1] - merge_range[0])
         outmod[gvals_merge] = (1.0 - weights) * outmod[gvals_merge] + weights * dmod[
             gvals_merge
         ]
