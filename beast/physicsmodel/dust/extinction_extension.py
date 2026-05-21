@@ -87,7 +87,7 @@ class F19_D03_extension(F19):
         """
         # Ensure x has units; if it's a raw array, default it to Angstroms
         if not hasattr(x, "unit"):
-            x = x * u.Angstrom
+            x = x * u.micron**-1
         # If it's already inverse microns, use it directly; otherwise, convert it
         if x.unit == u.micron**-1:
             x_um_inv = x
@@ -211,7 +211,7 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
         """
         # Ensure x has units; if it's a raw array, default it to Angstroms
         if not hasattr(x, "unit"):
-            x = x * u.Angstrom
+            x = x * u.micron**-1
         # If it's already inverse microns, use it directly; otherwise, convert it
         if x.unit == u.micron**-1:
             x_um_inv = x
