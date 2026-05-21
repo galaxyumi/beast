@@ -62,7 +62,7 @@ class F19_D03_extension(F19):
 
     # update the wavelength range (in micron^-1)
     x_range = [0.3, 1.0 / 0.01]
-    
+
     def evaluate(self, x, Rv):
         """
         F19_D03_extension function
@@ -85,8 +85,11 @@ class F19_D03_extension(F19):
         ValueError
            Input x values outside of defined range
         """
-        # convert wavelength to wavenumber
-        x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
+        # If it's already inverse microns, use it directly; otherwise, convert it
+        if x.unit == u.micron**-1:
+            x_um_inv = x
+        elif x.unit == u.Angstrom:
+            x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
 
         # just in case someone calls evaluate explicitly
         Rv = np.atleast_1d(Rv)
@@ -203,8 +206,11 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
         ValueError
            Input x values outside of defined range
         """
-        # convert wavelength to wavenumber
-        x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
+        # If it's already inverse microns, use it directly; otherwise, convert it
+        if x.unit == u.micron**-1:
+            x_um_inv = x
+        elif x.unit == u.Angstrom:
+            x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
 
         # compute the dust grain model
         dmodel = WD01(modelname="SMCBar")
