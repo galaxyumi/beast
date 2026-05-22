@@ -93,7 +93,7 @@ class F19_D03_extension(F19):
             x_um_inv = x
         elif x.unit == u.Angstrom:
             x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
-        
+
         # just in case someone calls evaluate explicitly
         Rv = np.atleast_1d(Rv)
 
