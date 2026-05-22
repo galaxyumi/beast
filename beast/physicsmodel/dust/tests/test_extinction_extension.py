@@ -26,7 +26,7 @@ def test_F19_D03_ext():
         cmod_vals = cmod(x)
         dmod_vals = dmod(x)
 
-    gvals_f19 = (x.value > emod.x_range[0]) & (x.value < emod.x_range[1])
+    gvals_f19 = (x > emod.x_range[0] / u.micron) & (x < emod.x_range[1] / u.micron)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=SpectralUnitsWarning)
@@ -34,13 +34,13 @@ def test_F19_D03_ext():
 
     # test that the combined model as the grain model values below 912 A
     # below the merge wavelengths
-    gvals_ion = x.value > 1.0 / 0.0912
+    gvals_ion = x > 1.0 / 0.0912 / u.micron
     np.testing.assert_allclose(cmod_vals[gvals_ion], dmod_vals[gvals_ion])
 
     # test that the combine dmodel has the F19 values above 1700 A
     # above the merge wavelengths
-    gvals_amerge = (x.value < 1.0 / 0.1700) & (x.value > emod.x_range[0])
-    gvals_amerge_f19 = x.value[gvals_f19] < 1.0 / 0.1700
+    gvals_amerge = (x < 1.0 / 0.1700 / u.micron) & (x > emod.x_range[0] / u.micron)
+    gvals_amerge_f19 = x[gvals_f19] < 1.0 / 0.1700 / u.micron
     np.testing.assert_allclose(cmod_vals[gvals_amerge], emod_vals[gvals_amerge_f19])
 
 
@@ -56,7 +56,7 @@ def test_G03_SMCBar_WD01_ext():
         cmod_vals = cmod(x)
         dmod_vals = dmod(x)
 
-    gvals_g03 = (x.value > emod.x_range[0]) & (x.value < emod.x_range[1])
+    gvals_g03 = (x > emod.x_range[0] / u.micron) & (x < emod.x_range[1] / u.micron)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=SpectralUnitsWarning)
@@ -64,11 +64,11 @@ def test_G03_SMCBar_WD01_ext():
 
     # test that the combined model as the grain model values below 912 A
     # below the merge wavelengths
-    gvals_ion = x.value > 1.0 / 0.0912
+    gvals_ion = x > 1.0 / 0.0912 / u.micron
     np.testing.assert_allclose(cmod_vals[gvals_ion], dmod_vals[gvals_ion])
 
     # test that the combine dmodel has the F19 values above 1700 A
     # above the merge wavelengths
-    gvals_amerge = (x.value < 1.0 / 0.1700) & (x.value > emod.x_range[0])
-    gvals_amerge_g03 = x.value[gvals_g03] < 1.0 / 0.1700
+    gvals_amerge = (x < 1.0 / 0.1700 / u.micron) & (x > emod.x_range[0] / u.micron)
+    gvals_amerge_g03 = x[gvals_g03] < 1.0 / 0.1700 / u.micron
     np.testing.assert_allclose(cmod_vals[gvals_amerge], emod_vals[gvals_amerge_g03])
