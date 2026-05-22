@@ -73,7 +73,7 @@ class F19_D03_extension(F19):
            expects either x in units of wavelengths or frequency
            or assumes wavelengths in wavenumbers [1/micron]
 
-           internally wavelengths in angstrom are used
+           internally wavenubmers in inverse micron are used
 
         Returns
         -------
@@ -85,7 +85,7 @@ class F19_D03_extension(F19):
         ValueError
            Input x values outside of defined range
         """
-        # Ensure x has units; if it's a raw array, default it to Angstroms
+        # Ensure x has units; if it's a raw array, default it to inverse microns
         if not hasattr(x, "unit"):
             x = x * u.micron**-1
         # If it's already inverse microns, use it directly; otherwise, convert it
@@ -93,7 +93,7 @@ class F19_D03_extension(F19):
             x_um_inv = x
         elif x.unit == u.Angstrom:
             x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
-
+        
         # just in case someone calls evaluate explicitly
         Rv = np.atleast_1d(Rv)
 
@@ -118,7 +118,7 @@ class F19_D03_extension(F19):
 
         # compute the F19 curve for the input Rv over the F19 defined wavelength range
         gvals_f19 = (x_um_inv.value > super().x_range[0]) & (x_um_inv.value < super().x_range[1])
-        fmod = super().evaluate(x.value[gvals_f19], Rv)
+        fmod = super().evaluate(x_um_inv.value[gvals_f19], Rv)
 
         # now merge the two smoothly
         outmod = copy.copy(dmod)
@@ -197,7 +197,7 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
            expects either x in units of wavelengths or frequency
            or assumes wavelengths in wavenumbers [1/micron]
 
-           internally wavelengths in angstrom are used
+           internally wavenumbers in inverse micron are used
 
         Returns
         -------
@@ -209,7 +209,7 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
         ValueError
            Input x values outside of defined range
         """
-        # Ensure x has units; if it's a raw array, default it to Angstroms
+        # Ensure x has units; if it's a raw array, default it to inverse microns
         if not hasattr(x, "unit"):
             x = x * u.micron**-1
         # If it's already inverse microns, use it directly; otherwise, convert it
@@ -224,7 +224,7 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
 
         # compute the F19 curve for the input Rv over the F19 defined wavelength range
         gvals_g03 = (x_um_inv.value > super().x_range[0]) & (x_um_inv.value < super().x_range[1])
-        fmod = super().evaluate(x.value[gvals_g03])
+        fmod = super().evaluate(x_um_inv.value[gvals_g03])
 
         # now merge the two smoothly
         outmod = copy.copy(dmod)
