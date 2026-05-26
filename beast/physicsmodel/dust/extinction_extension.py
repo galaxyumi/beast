@@ -73,7 +73,7 @@ class F19_D03_extension(F19):
            expects either x in units of wavelengths or frequency
            or assumes wavelengths in wavenumbers [1/micron]
 
-           internally wavenubmers in inverse micron are used
+           internally wavenumbers in inverse micron are used
 
         Returns
         -------
