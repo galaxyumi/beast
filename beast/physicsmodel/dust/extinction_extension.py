@@ -88,11 +88,7 @@ class F19_D03_extension(F19):
         # Ensure x has units; if it's a raw array, default it to inverse microns
         if not hasattr(x, "unit"):
             x = x * u.micron**-1
-        # If it's already inverse microns, use it directly; otherwise, convert it
-        if x.unit == u.micron**-1:
-            x_um_inv = x
-        elif x.unit == u.Angstrom:
-            x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
+        x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
 
         # just in case someone calls evaluate explicitly
         Rv = np.atleast_1d(Rv)
@@ -212,11 +208,7 @@ class G03_SMCBar_WD01_extension(G03_SMCBar):
         # Ensure x has units; if it's a raw array, default it to inverse microns
         if not hasattr(x, "unit"):
             x = x * u.micron**-1
-        # If it's already inverse microns, use it directly; otherwise, convert it
-        if x.unit == u.micron**-1:
-            x_um_inv = x
-        elif x.unit == u.Angstrom:
-            x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
+        x_um_inv = x.to(u.micron**-1, equivalencies=u.spectral())
 
         # compute the dust grain model
         dmodel = WD01(modelname="SMCBar")
