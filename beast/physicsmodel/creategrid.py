@@ -23,7 +23,7 @@ from tqdm import tqdm
 
 from beast.physicsmodel.stars import stellib
 from beast.physicsmodel.grid import SpectralGrid, SEDGrid
-from beast.physicsmodel.grid_and_prior_weights import compute_av_rv_fA_prior_weights
+from beast.physicsmodel.grid_and_prior_weights import compute_av_rv_fA_prior_weights, compute_av_rv_prior_weights
 
 from beast.physicsmodel.grid_weights import compute_grid_weights
 
@@ -318,7 +318,8 @@ def make_extinguished_grid(
     # get the min/max R(V) values necessary for the grid point definition
     min_Rv = min(rvs)
     max_Rv = max(rvs)
-    Rv_B = extLaw.BLaw.Rv  # R(V) for the SMC-like extinction curve
+    if hasattr(extLaw, "BLaw"):
+        Rv_B = extLaw.BLaw.Rv  # R(V) for the SMC-like extinction curve
 
     # Create the sampling mesh
     # ========================
@@ -411,6 +412,16 @@ def make_extinguished_grid(
                 cols["f_A"][N0 * count : N0 * (count + 1)] = f_A
                 cols["Rv_A"][N0 * count : N0 * (count + 1)] = Rv_MW
 
+                # compute the dust weights
+                dust_prior_weight = compute_av_rv_fA_prior_weights(
+                    Av,
+                    Rv,
+                    f_A,
+                    g0.grid["distance"].data,
+                    av_prior_model=av_prior_model,
+                    rv_prior_model=rv_prior_model,
+                    fA_prior_model=fA_prior_model,
+                )
             else:
                 Av, Rv = pt
                 r = g0.applyExtinctionLaw(extLaw, Av=Av, Rv=Rv, inplace=False)
@@ -427,16 +438,14 @@ def make_extinguished_grid(
                 cols["Av"][N0 * count : N0 * (count + 1)] = Av
                 cols["Rv"][N0 * count : N0 * (count + 1)] = Rv
 
-            # compute the dust weights
-            dust_prior_weight = compute_av_rv_fA_prior_weights(
-                Av,
-                Rv,
-                f_A,
-                g0.grid["distance"].data,
-                av_prior_model=av_prior_model,
-                rv_prior_model=rv_prior_model,
-                fA_prior_model=fA_prior_model,
-            )
+                # compute the dust weights
+                dust_prior_weight = compute_av_rv_prior_weights(
+                    Av,
+                    Rv,
+                    g0.grid["distance"].data,
+                    av_prior_model=av_prior_model,
+                    rv_prior_model=rv_prior_model,
+                )
 
             # get new attributes if exist
             for key in list(temp_results.grid.keys()):
