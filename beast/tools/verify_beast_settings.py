@@ -206,7 +206,7 @@ def verify_input_format(settings):
     parameters_limits = parameters_base_limits + params_extra_limits
 
     for i, param_ in enumerate(parameters):
-        if parameters_names[i] == "fAs" and param_ == None:
+        if parameters_names[i] == "fAs" and param_ is None:
             pass
         else:
             verify_one_input_format(
