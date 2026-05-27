@@ -29,7 +29,6 @@ __all__ = [
     "compute_age_mass_metallicity_weights",
     "compute_distance_age_mass_metallicity_weights",
     "compute_av_rv_fA_prior_weights",
-    "compute_av_rv_prior_weights",
 ]
 
 
@@ -349,51 +348,6 @@ def compute_av_rv_fA_prior_weights(
             f_A_weights = fA_prior(f_A)
 
     dust_prior = av_weights * rv_weights * f_A_weights
-
-    # normalize to control for numerical issues
-    # dust_prior /= np.max(dust_prior)
-
-    return dust_prior
-
-
-def compute_av_rv_prior_weights(
-    Av,
-    Rv,
-    dists,
-    av_prior_model={"name": "flat"},
-    rv_prior_model={"name": "flat"},
-):
-    """
-    Computes the av and rv grid and prior weights
-    on the BEAST model spectra grid
-    Grid and prior weight columns updated by multiplying by the
-    existing weights
-
-    Parameters
-    ----------
-    Av : vector
-        A(V) values
-    Rv : vector
-        R(V) values
-    dists : vector
-        distance values
-    av_prior_model : dict
-        dict including prior model name and parameters
-    rv_prior_model : dict
-        dict including prior model name and parameters
-    """
-    av_prior = PriorDustModel(av_prior_model)
-    rv_prior = PriorDustModel(rv_prior_model)
-    if av_prior_model["name"] == "step":
-        av_weights = av_prior(np.full((len(dists)), Av), y=dists)
-    else:
-        av_weights = av_prior(Av)
-    if rv_prior_model["name"] == "step":
-        rv_weights = rv_prior(np.full((len(dists)), Rv), y=dists)
-    else:
-        rv_weights = rv_prior(Rv)
-
-    dust_prior = av_weights * rv_weights
 
     # normalize to control for numerical issues
     # dust_prior /= np.max(dust_prior)
