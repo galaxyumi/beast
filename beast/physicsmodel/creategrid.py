@@ -493,11 +493,12 @@ def make_extinguished_grid(
             cols["weight"][gvals] *= rav_gweight
             cols["grid_weight"][gvals] *= rav_gweight
 
-        fA_grid_weights = compute_grid_weights(fAs)
-        for cfA, cfA_gweight in zip(fAs, fA_grid_weights):
-            gvals = cols["f_A"] == cfA
-            cols["weight"][gvals] *= cfA_gweight
-            cols["grid_weight"][gvals] *= cfA_gweight
+        if with_fA:
+            fA_grid_weights = compute_grid_weights(fAs)
+            for cfA, cfA_gweight in zip(fAs, fA_grid_weights):
+                gvals = cols["f_A"] == cfA
+                cols["weight"][gvals] *= cfA_gweight
+                cols["grid_weight"][gvals] *= cfA_gweight
 
         # free the memory of temp_results
         # del temp_results

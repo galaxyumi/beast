@@ -205,11 +205,10 @@ def verify_input_format(settings):
     param_format = param_format + params_extra_format
     parameters_limits = parameters_base_limits + params_extra_limits
 
-    dust_model = settings.extLaw.name
     for i, param_ in enumerate(parameters):
-        if parameters_names[i] == "fAs" and "G23" in dust_model:
+        if parameters_names[i] == "fAs" and param_ == None:
             pass
-        else:   
+        else:
             verify_one_input_format(
                 param_,
                 parameters_names[i],
