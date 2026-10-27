@@ -221,6 +221,7 @@ def verify_input_format(settings):
                     parameters_names[i] + " is None: please provide a value."
                 )
 
+
 if __name__ == "__main__":  # pragma: no cover
 
     pass
